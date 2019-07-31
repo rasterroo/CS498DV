@@ -24,7 +24,7 @@
     opacity: 0;
     position: absolute;
     text-align: left;
-    width: 220px; height: 80px;
+    width: 150px; height: 80px;
     background: white;
     border: solid;
     border-width: 1px;
@@ -95,9 +95,6 @@
 
             const data = await d3.csv('https://flunky.github.io/cars2017.csv');  
 
-            var margin = {top: 20, right: 20, bottom: 20, left: 20},
-            width = 600 - margin.left - margin.right,
-            height = 600 - margin.top - margin.bottom;
             var x = d3.scaleLog()
                 .base(10)
                 .domain([10,150])
@@ -127,8 +124,8 @@
                 tooltip
                   .style("opacity",1)
                   .style("left", (d3.mouse(this)[0]+350) + "px")
-                  .style("top", (d3.mouse(this)[1]+190) + "px")
-                  .html("EngineCylinders: "+d.EngineCylinders+"<br>AverageCityMPG : "+d.AverageCityMPG+"<br>AverageHighwayMPG : "+d.AverageHighwayMPG);
+                  .style("top", (d3.mouse(this)[1]+120) + "px")
+                  .html("Make : "+d.Make);
               })
               .on("mouseout", function() { tooltip.style("opacity",0) });
            
@@ -149,20 +146,6 @@
               .attr("transform", "translate(50,550)")
               .call(d3.axisBottom(xs).tickValues([10,20,50,100]).tickFormat(d3.format("~s")));
 
-            d3.select('svg').append("text")      // text label for the x axis
-              .attr("class", "x label")
-              .attr("transform", "translate(" + ((width / 2)+margin.left) + " ," + (height + margin.bottom) + ")")
-              .style("text-anchor", "middle")
-              .text("Average City MPG");
-
-            d3.select('svg').append("text")     // text label for the y axis
-              .attr("class", "y label")
-              .attr("text-anchor", "end")
-              .attr("y", 0)
-              .attr("x", 75 - (height / 2))
-              .attr("dy", "1em")
-              .attr("transform", "rotate(-90)")
-              .text("Average Hightway MPG");
         }
       </script>
       </div>
