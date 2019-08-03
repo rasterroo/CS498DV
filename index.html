@@ -21,10 +21,11 @@
   <style> 
   .chart circle {fill: #69b3a2; stroke: black;} 
   #tooltip {
+    padding: 5px;
     opacity: 0;
     position: absolute;
     text-align: left;
-    width: 220px; height: 80px;
+    width: 220px; height: 100px;
     background: white;
     border: solid;
     border-width: 1px;
@@ -87,84 +88,90 @@
           <button onclick="window.location.href = '2.html';">2</button>
           <button onclick="window.location.href = '3.html';">3</button>
         </div></p>
-        <svg class="chart" width=600 height=600></svg>
-        <div id="tooltip"></div>
+        <div class="row">
+          <div class="col-sm-4">.col-sm-4</div>
+          <div class="col-sm-8">
+        
+            <svg class="chart" width=600 height=600></svg>
+            <div id="tooltip"></div>
 
-        <script>
-          async function init() {
+            <script>
+              async function init() {
 
-            const data = await d3.csv('https://flunky.github.io/cars2017.csv');  
+                const data = await d3.csv('https://flunky.github.io/cars2017.csv');  
 
-            var margin = {top: 20, right: 20, bottom: 20, left: 20},
-            width = 600 - margin.left - margin.right,
-            height = 600 - margin.top - margin.bottom;
-            var x = d3.scaleLog()
-                .base(10)
-                .domain([10,150])
-                .range([0, 500]);
+                var margin = {top: 20, right: 20, bottom: 20, left: 20},
+                width = 600 - margin.left - margin.right,
+                height = 600 - margin.top - margin.bottom;
+                var x = d3.scaleLog()
+                    .base(10)
+                    .domain([10,150])
+                    .range([0, 500]);
 
-            var y = d3.scaleLog()
-                .base(10)
-                .domain([10,150])
-                .range([500,0]);
+                var y = d3.scaleLog()
+                    .base(10)
+                    .domain([10,150])
+                    .range([500,0]);
 
-            var tooltip = d3.select("#tooltip"); 
+                var tooltip = d3.select("#tooltip"); 
 
-            d3.select('svg')
-              .attr("width", 600)
-              .attr("height", 600)
-              .append("g")
-                .attr("transform", "translate(50,50)")
-              .selectAll('circle')
-              .data(data)
-              .enter()
-              .append('circle')
-                .attr('cx',function(d) {return x(d.AverageCityMPG);})
-                .attr('cy',function(d) {return y(d.AverageHighwayMPG);})
-                .attr('r', function(d) {return (4+parseInt(d.EngineCylinders));})
-                .style("opacity", 0.4)
-              .on("mouseover", function(d,i) {
-                tooltip
-                  .style("opacity",1)
-                  .style("left", (d3.mouse(this)[0]+350) + "px")
-                  .style("top", (d3.mouse(this)[1]+190) + "px")
-                  .html("EngineCylinders: "+d.EngineCylinders+"<br>AverageCityMPG : "+d.AverageCityMPG+"<br>AverageHighwayMPG : "+d.AverageHighwayMPG);
-              })
-              .on("mouseout", function() { tooltip.style("opacity",0) });
-           
+                d3.select('svg')
+                  .attr("width", 600)
+                  .attr("height", 600)
+                  .append("g")
+                    .attr("transform", "translate(50,50)")
+                  .selectAll('circle')
+                  .data(data)
+                  .enter()
+                  .append('circle')
+                    .attr('cx',function(d) {return x(d.AverageCityMPG);})
+                    .attr('cy',function(d) {return y(d.AverageHighwayMPG);})
+                    .attr('r', function(d) {return (4+parseInt(d.EngineCylinders));})
+                    .style("opacity", 0.4)
+                  .on("mouseover", function(d,i) {
+                    tooltip
+                      .style("opacity",1)
+                      .style("left", (d3.mouse(this)[0]+180) + "px")
+                      .style("top", (d3.mouse(this)[1]) + "px")
+                      .html("Make: "+d.Make+"<br>EngineCylinders: "+d.EngineCylinders+"<br>AverageCityMPG : "+d.AverageCityMPG+"<br>AverageHighwayMPG : "+d.AverageHighwayMPG);
+                  })
+                  .on("mouseout", function() { tooltip.style("opacity",0) });
+              
 
-            xs = d3.scaleLog()
-                .base(10)
-                .domain([10,150])
-                .range([0, 500]);
-            ys = d3.scaleLog()
-                .base(10)
-                .domain([10,150])
-                .range([500,0]);
+                xs = d3.scaleLog()
+                    .base(10)
+                    .domain([10,150])
+                    .range([0, 500]);
+                ys = d3.scaleLog()
+                    .base(10)
+                    .domain([10,150])
+                    .range([500,0]);
 
-            d3.select('svg').append('g')
-              .attr("transform", "translate(50,50)")
-              .call(d3.axisLeft(ys).tickValues([10,20,50,100]).tickFormat(d3.format("~s")));
-            d3.select('svg').append('g')
-              .attr("transform", "translate(50,550)")
-              .call(d3.axisBottom(xs).tickValues([10,20,50,100]).tickFormat(d3.format("~s")));
+                d3.select('svg').append('g')
+                  .attr("transform", "translate(50,50)")
+                  .call(d3.axisLeft(ys).tickValues([10,20,50,100]).tickFormat(d3.format("~s")));
+                d3.select('svg').append('g')
+                  .attr("transform", "translate(50,550)")
+                  .call(d3.axisBottom(xs).tickValues([10,20,50,100]).tickFormat(d3.format("~s")));
 
-            d3.select('svg').append("text")      // text label for the x axis
-              .attr("class", "x label")
-              .attr("transform", "translate(" + ((width / 2)+margin.left) + " ," + (height + margin.bottom) + ")")
-              .style("text-anchor", "middle")
-              .text("Average City MPG");
+                d3.select('svg').append("text")      // text label for the x axis
+                  .attr("class", "x label")
+                  .attr("transform", "translate(" + ((width / 2)+margin.left) + " ," + (height + margin.bottom) + ")")
+                  .style("text-anchor", "middle")
+                  .text("Average City MPG");
 
-            d3.select('svg').append("text")     // text label for the y axis
-              .attr("class", "y label")
-              .attr("text-anchor", "end")
-              .attr("y", 0)
-              .attr("x", 75 - (height / 2))
-              .attr("dy", "1em")
-              .attr("transform", "rotate(-90)")
-              .text("Average Hightway MPG");
-        }
-      </script>
+                d3.select('svg').append("text")     // text label for the y axis
+                  .attr("class", "y label")
+                  .attr("text-anchor", "end")
+                  .attr("y", 0)
+                  .attr("x", 75 - (height / 2))
+                  .attr("dy", "1em")
+                  .attr("transform", "rotate(-90)")
+                  .text("Average Hightway MPG");
+                }
+              </script>
+            </div>
+        </div>
       </div>
     </div>
   </div>
