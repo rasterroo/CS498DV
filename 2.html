@@ -35,7 +35,7 @@
     opacity: 0;
     position: absolute;
     text-align: left;
-    width: 100px; height: 60px;
+    width: 110px; height: 60px;
     background-color: rgba(0,0,0,0.75);
     color: white;
     border-radius: 2px;
@@ -117,7 +117,7 @@
               var color = d3.scaleSequential(d3.interpolateGnBu)
                   .domain([0, 8])
 
-              var width = 600,
+              var width = 650,
                   height = 600,
                   radius = 250;
                   
@@ -148,6 +148,13 @@
 
 
               // Add the polylines between chart and labels:
+              // CITATION POLYLINES ANNOTATIONS TAKEN FROM HERE:
+              //
+              //  https://www.d3-graph-gallery.com/graph/donut_label.html
+              //
+              //
+
+
               svg
                 .selectAll('allPolylines')
                 .data(pie(data))
