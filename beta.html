@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>CS498DV</title>
+
+  <!-- Bootstrap core CSS -->
+
+  <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <script src='https://d3js.org/d3.v5.min.js'></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+ 
+
+
+  <style> 
+  .axis path,
+  .axis line {
+    fill: none;
+    stroke: #000; 
+    shape-rendering: crispEdges;
+  }
+
+  #chart circle {fill: #69b3a2; stroke: black;} 
+
+  #tooltip {
+    padding: 5px;
+    opacity: 0;
+    position: absolute;
+    text-align: left;
+    width: 210px; height: 105px;
+    background-color: rgba(0,0,0,0.75);
+    color: white;
+    border-radius: 2px;
+    box-shadow: 0 0 5px #999999;
+    pointer-events: all;  
+  }
+
+  .btn-group button {
+  background-color: grey; /* Green background */
+  border: 1px solid black; /* Green border */
+  color: white; /* White text */
+  padding: 10px 24px; /* Some padding */
+  cursor: pointer; /* Pointer/hand icon */
+  float: left; /* Float the buttons side by side */
+  }
+
+  /* Clear floats (clearfix hack) */
+  .btn-group:after {
+    content: "";
+    clear: both;
+    display: table;
+  }
+
+  .btn-group button:not(:last-child) {
+    border-right: none; /* Prevent double borders */
+  }
+
+  /* Add a background color on hover */
+  .btn-group button:hover {
+    background-color: #555555;
+  }
+  </style>
+</head>
+
+<body onload='init()'>
+
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+    <div class="container">
+      <a class="navbar-brand" href="#">CS498 Data Visualization</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarResponsive">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/rasterroo/CS498DV">Github</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav> 
+
+  <!-- Page Content -->
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12 text-center">
+        <h1 class="mt-5">2017 Automobile Data</h1>
+        <p><div class="btn-group">
+          <button onclick="window.location.href = 'index.html';" style="background-color: #555555;">1</button>
+          <button onclick="window.location.href = '2.html';">2</button>
+          <button onclick="window.location.href = '3.html';">3</button>
+        </div></p>
+        <div class="row">
+          <div class="col-sm-4">
+            <h3>Fuel Efficiency Scatterplot</h3>
+            <button id="resetbtn">Reset</button>
+            <p></p>
+
+          </div>
+          <div class="col-sm-8">
+            
+            <div id="chart"></div>
+            <div id="tooltip" class="hidden">
+            <script>
+              async function init() {
+
+                const data = await d3.csv('https://flunky.github.io/cars2017.csv');  
+
+                // set the dimensions and margins of the graph
+                var margin = {top: 10, right: 10, bottom:40, left: 40},
+                    width = 700 - margin.left - margin.right,
+                    height = 600 - margin.top - margin.bottom;
+
+                // append the SVG object to the body of the page
+                var SVG = d3.select("#chart")
+                  .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                  .append("g")
+                    .attr("transform",
+                          "translate(" + margin.left + "," + margin.top + ")");
+
+              
+                // Add X axis
+                var x = d3.scaleLog()
+                    .base(10)
+                    .domain([10,150])
+                    .range([0, width]);
+
+                var xAxis = SVG.append("g")
+                  .attr("class", "x axis")
+                  .attr("transform", "translate(0," + height + ")")
+                  .call(d3.axisBottom(x).tickValues([10,20,50,100]).tickFormat(d3.format("~s")));
+                
+                SVG.append("text")
+                    .attr("class", "label")
+                    .attr("x", width/2)
+                    .attr("y", height+35)
+                    .style("text-anchor", "middle")
+                    .text("Average City MPG");
+
+                // Add Y axis
+                var y = d3.scaleLog()
+                    .base(10)
+                    .domain([10,150])
+                    .range([height,0]);
+
+                var yAxis = SVG.append("g")
+                  .attr("class", "y axis")
+                  .call(d3.axisLeft(y).tickValues([10,20,50,100]).tickFormat(d3.format("~s")));
+                  
+                SVG.append("text")
+                  .attr("class", "label")
+                  .attr("transform", "rotate(-90)")
+                  .attr("y", -margin.left-5)
+                  .attr("x", -height/2)
+                  .attr("dy", "1em")
+                  .style("text-anchor", "middle")
+                  .text("Average Hightway MPG");
+
+                // Add tooltips
+                var tooltip = d3.select("#tooltip");
+
+                // Add a clipPath: everything out of this area won't be drawn.
+                var clip = SVG.append("defs").append("SVG:clipPath")
+                    .attr("id", "clip")
+                    .append("SVG:rect")
+                    .attr("width", width )
+                    .attr("height", height )
+                    .attr("x", 0)
+                    .attr("y", 0);
+
+                // Create the scatter variable: where both the circles and the brush take place
+                var scatter = SVG.append('g')
+                  .attr("clip-path", "url(#clip)");
+
+                // Add circles
+                scatter
+                  .selectAll("circle")
+                  .data(data)
+                  .enter()
+                  .append("circle")
+                    .attr('cx',function(d) {return x(d.AverageCityMPG);})
+                    .attr('cy',function(d) {return y(d.AverageHighwayMPG);})
+                    .attr('r', function(d) {return ((4+parseInt(d.EngineCylinders)));})
+                    .style("opacity", 1);
+                    
+
+                d3.select('svg')
+                  //.html("Make: "+d.Make+"<br>EngineCylinders: "+d.EngineCylinders+"<br>AverageCityMPG : "+d.AverageCityMPG+"<br>AverageHighwayMPG : "+d.AverageHighwayMPG)
+                
+                // Set the zoom and Pan features: how much you can zoom, on which part, and what to do when there is a zoom
+                var zoom = d3.zoom()
+                    .scaleExtent([.5, 3])  // This control how much you can unzoom (x0.5) and zoom (x20)
+                    .extent([[0, 0], [width, height]])
+                    .on("zoom", updateChart);
+
+                // This add an invisible rect on top of the chart area. This rect can recover pointer events: necessary to understand when the user zoom
+                SVG.append("rect")
+                    .attr("width", width)
+                    .attr("height", height)
+                    .style("fill", "none")
+                    .style("pointer-events", "all")
+                    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+                    .call(zoom);
+                // now the user can zoom and it will trigger the function called updateChart
+
+                d3.select("#resetbtn")
+                    .on("click", resetted);
+
+                // A function that updates the chart when the user zoom and thus new boundaries are available
+                function updateChart() {
+
+                  // recover the new scale
+                  var newX = d3.event.transform.rescaleX(x);
+                  var newY = d3.event.transform.rescaleY(y);
+
+                  // update axes with these new boundaries
+                  xAxis.call(d3.axisBottom(newX).tickValues([10,20,50,100]).tickFormat(d3.format("~s")));
+                  yAxis.call(d3.axisLeft(newY).tickValues([10,20,50,100]).tickFormat(d3.format("~s")));
+
+                  // update circle position
+                  scatter
+                    .selectAll("circle")
+                    .attr('cx', function(d) {return newX(d.AverageCityMPG)})
+                    .attr('cy', function(d) {return newY(d.AverageHighwayMPG)});
+                }
+
+
+                function resetted() {
+                  SVG.transition()
+                      .call(zoom.transform, d3.zoomIdentity);
+                }
+                
+              }
+            </script>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+ 
+
+
+  
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="vendor/jquery/jquery.slim.min.js"></script>
+  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
